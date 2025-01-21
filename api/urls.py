@@ -1,10 +1,7 @@
-from django.urls import path, include
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from api.views import ProtectedView 
+from django.urls import path
+from .views import  PostListView, PostDetailView
 
 urlpatterns = [
-    path('api/', include('api.urls')),  
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), 
-    path('api/protected/', ProtectedView.as_view(), name='protected'),  
+    path('posts/', PostListView.as_view(), name='post-list'),
+    path('posts/<int:id>/', PostDetailView.as_view(), name='post-detail'),
 ]
