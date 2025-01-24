@@ -9,6 +9,7 @@ from .models import Post
 from .serializers import PostSerializer
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.utils.decorators import method_decorator
 
 class PostListView(APIView):
     permission_classes = [IsAuthenticated]  
@@ -19,16 +20,17 @@ class PostListView(APIView):
         return Response(serializer.data)
 
 class PostDetailView(APIView):
-    permission_classes = [HasAPIKey]  
+    permission_classes = [HasAPIKey]
 
     def get(self, request, id):
+        print(f"Authorization Header: {request.headers.get('Authorization')}")  
         try:
             post = Post.objects.get(id=id)
             serializer = PostSerializer(post)
             return Response(serializer.data, status=200)
         except Post.DoesNotExist:
             return Response({"error": "Post not found"}, status=404)
-        
+
 class CustomLoginView(APIView):
     permission_classes = [AllowAny]  
 
@@ -46,14 +48,17 @@ class CustomLoginView(APIView):
             }, status=200)
         else:
             return Response({"message": "Invalid credentials"}, status=401)
-
 class PostCreateView(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        print(f"User: {request.user}")
+        print(f"Session Key: {request.session.session_key}")
+        
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(author=request.user)
             return Response({"message": "Post created successfully"}, status=201)
+        print(f"Serializer Errors: {serializer.errors}")
         return Response(serializer.errors, status=400)
